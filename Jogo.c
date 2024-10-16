@@ -18,10 +18,9 @@ typedef struct {
 
 typedef struct {
     char nome[maxCaracter];
-    pokemon pokemonsDisponiveis[totalPokemons];
     pokemon pokemonsEscolhidos[qntPokemon];
+    int jaEscolhido[qntPokemon];
     pokemon pokemonEmCampo;
-    int escolhasFeitas;
 } jogador;
 
 // Tabela de efetividade dos tipos
@@ -97,175 +96,122 @@ void inicializarPokemon(pokemon pokemons[]) {
     strcpy(pokemons[2].habilidades[2], "Habilidade 3");
 }
 
-void exibirPokemonsDisponiveis(jogador* jogadorAtual) {
-    printf("\nPokémons disponíveis para %s:\n", jogadorAtual->nome);
-    for (int i = 0; i < totalPokemons; i++) {
-        printf("%d. %s (Tipo: %s, Vida: %d)\n", i + 1, jogadorAtual->pokemonsDisponiveis[i].nome,
-               jogadorAtual->pokemonsDisponiveis[i].tipo, jogadorAtual->pokemonsDisponiveis[i].vida);
+void imprimirPokemons(pokemon pokemons[], int quantidade) {
+    for (int i = 0; i < quantidade; i++) {
+        printf("Pokemon %d: \nNome: %s - Tipo: %s - Vida: %d \nHabilidades: ", 
+                i + 1, pokemons[i].nome, pokemons[i].tipo, pokemons[i].vida);
+        for (int j = 0; j < qntSkills; j++) {
+            printf(" %s,", pokemons[i].habilidades[j]);
+        }
+        printf("\n\n");
     }
 }
 
-void escolherPokemon(jogador* jogadorAtual, int escolha) {
-    jogadorAtual->pokemonEmCampo = jogadorAtual->pokemonsDisponiveis[escolha - 1];
-    //printf("\n%s escolheu %s como seu pokémon em campo!\n", jogadorAtual->nome, jogadorAtual->pokemonEmCampo.nome);
-}
 
-void exibirPokemonsEscolhidos(pokemon pokemons[], int numPokemons) {
-    for (int i = 0; i < numPokemons; i++) {
-        printf("  - %s (Tipo: %s, Vida: %d)\n", pokemons[i].nome, pokemons[i].tipo, pokemons[i].vida);
+void escolherPokemon(jogador *player, pokemon pokemonsDisponiveis[], int totalDisponiveis) {
+    int escolha, numEscolhas = 0;
+
+
+    // Reseta o array de controle para o jogador atual
+    for (int i = 0; i < totalDisponiveis; i++) {
+        player->jaEscolhido[i] = 0;
+    }
+
+    while (numEscolhas < qntPokemon) {
+        printf("%s, escolha seu Pokémon %d:\n", player->nome, numEscolhas + 1);
+        imprimirPokemons(pokemonsDisponiveis, totalDisponiveis);
+        printf("Digite o número do Pokémon que deseja escolher (1 a %d): ", totalDisponiveis);
+        scanf("%d", &escolha);
+
+        if (escolha < 1 || escolha > totalDisponiveis) {
+            printf("Escolha inválida, tente novamente.\n");
+        } else if (player->jaEscolhido[escolha - 1]) {
+            printf("Você já escolheu este Pokémon, escolha outro.\n");
+        } else {
+            // Armazena a escolha do Pokémon
+            player->pokemonsEscolhidos[numEscolhas] = pokemonsDisponiveis[escolha - 1];
+            player->jaEscolhido[escolha - 1] = 1; // Marca o Pokémon como já escolhido para este jogador
+            numEscolhas++;
+            printf("Você escolheu: %s\n\n", pokemonsDisponiveis[escolha - 1].nome);
+        }
     }
 }
-
-void realizarAtaque(jogador* atacante, jogador* defensor) {
-    int dano = danoBase; // Pode ser ajustado com base no tipo e habilidades
-    defensor->pokemonEmCampo.vida -= dano;
-    printf("\n%s atacou %s, causando %d de dano!\n", atacante->pokemonEmCampo.nome, defensor->pokemonEmCampo.nome, dano);
-    printf("%s agora tem %d de vida restante.\n", defensor->pokemonEmCampo.nome, defensor->pokemonEmCampo.vida);
-}
-
-void jogo(jogador jogador1, jogador jogador2) {
-    int escolha1, escolha2;
-    int acoes;
-
-    for (int i = 0; i < qntPokemon; i++)
+/*
+void imprimirPokemonsEscolhidos(jogador player, int quantidade){
+    for (int i = 0; i < quantidade; i++)
     {
-            // Jogadores escolhem seus pokémons
-    printf("\n%s, escolha seu pokémon:\n", jogador1.nome);
-    exibirPokemonsDisponiveis(&jogador1);
-    printf("Escolha (1-%d): ", totalPokemons);
-    scanf("%d", &escolha1);
-    escolherPokemon(&jogador1, escolha1);
-
-    printf("\n%s, escolha seu pokémon:\n", jogador2.nome);
-    exibirPokemonsDisponiveis(&jogador2);
-    printf("Escolha (1-%d): ", totalPokemons);
-    scanf("%d", &escolha2);
-    escolherPokemon(&jogador2, escolha2);
-    }
-
-    printf("Jogador %s escolha com qual pokemon irá começar:", jogador1.nome);
-    exibirPokemonsEscolhidos(jogador1.pokemonsEscolhidos, qntPokemon);
-
-    
-   
-    // Loop de batalha
-    while (
-        (jogador1.pokemonsEscolhidos[0].vida > 0 || jogador1.pokemonsEscolhidos[1].vida > 0) &&
-        (jogador2.pokemonsEscolhidos[0].vida > 0 || jogador2.pokemonsEscolhidos[1].vida > 0)
-    ) {
-        printf("Jogador %s que será sua ação:");
-        system("clear");
-        printf("=============Escolhas Inválidas farão voce perder a vez=============");
-        printf("1. Trocar de Pokemon");
-        printf("2. Atacar com o %s", jogador1.pokemonsEscolhidos);
-        printf("3. Listar os Ataques do %s", jogador1.pokemonsEscolhidos);
-        printf("4. Loja");
-        printf("5. Desistir");
-
-        switch (acoes)
+        printf("pokemon: %d\n Nome: %s - Tipo: %s - Vida: %d\n Habilidades:",i + 1, player.pokemonsEscolhidos[i].nome, player.pokemonsEscolhidos[i].tipo, player.pokemonsEscolhidos[i].vida);
+        for (int j = 0; i < qntSkills; j++)
         {
-        case 1: /* constant-expression */
-            //Função de trocar o pokemon escolhido
-            break;
-        
-        case 2:
-
-            break;
-        
-        case 3:
-            
-            break;
-
-        case 4:
-            
-            break;
-
-        case 5:
-            
-            break;
-        default:
-            printf("Perdeu a vez");
-            break;
+            printf(" %s", player.pokemonsEscolhidos[j].habilidades);
         }
-
-
-            
-        // Jogador 1 ataca
-        //realizarAtaque(&jogador1, &jogador2);
-
-        // Verifica se o Pokémon do jogador 2 ainda está vivo
-        if (jogador2.pokemonEmCampo.vida <= 0) {
-            printf("\n%s venceu a batalha!\n", jogador1.nome);
-            break;
-        }
-
-        // Jogador 2 ataca
-        //realizarAtaque(&jogador2, &jogador1);
-
-        // Verifica se o Pokémon do jogador 1 ainda está vivo
-        if (jogador1.pokemonEmCampo.vida <= 0) {
-            printf("\n%s venceu a batalha!\n", jogador2.nome);
-            break;
-        }
+        printf("/n/n");
     }
+    
+}
+*/
+
+void pokemonEmCampo(jogador player){
+    int escolha = 0;
+    imprimirPokemons(player.pokemonsEscolhidos, qntPokemon);
+    printf("Jogador %s escolha o pokemon em Campo: ", player.nome);
+    scanf("%d", &escolha);
+
+    for (int i = 0; i <= escolha; i++)
+    {
+        player.pokemonEmCampo = player.pokemonsEscolhidos[i - 1];
+    }
+    
+
+    printf("O jogador %s escolheu o pokemon %s\n", player.nome, player.pokemonEmCampo.nome);
+    
 }
 
-void mostrarMenu() {
-    printf("=== Bem-vindo ao Jogo de Pokémon ===\n");
-    printf("1. Começar Jogo\n");
-    printf("2. Regras do Jogo\n");
-    printf("3. Sair\n");
-}
-
-void menuJogo() {
-    printf("1. Escolher Pokémon\n");
-    printf("2. Loja\n");
-    printf("3. Sair do Jogo\n");
+void pausar() {
+    printf("\nPressione Enter para continuar...");
+    while (getchar() != '\n');  // Limpa qualquer caractere residual no buffer
+    getchar();  // Aguarda o Enter do usuário
 }
 
 int main() {
-    jogador jogador1, jogador2;
-    pokemon pokemons[totalPokemons];
+    jogador player1, player2;
+    pokemon pokemonsDisponiveis[totalPokemons];
+    int jaEscolhido[totalPokemons] = {0};  // Array para rastrear pokémons já escolhidos
 
-    // Inicializando os pokémons disponíveis
-    inicializarPokemon(pokemons);
+    // Inicializa os pokémons disponíveis
+    inicializarPokemon(pokemonsDisponiveis);
 
-    // Atribuindo os pokémons disponíveis para os jogadores
-    for (int i = 0; i < totalPokemons; i++) {
-        jogador1.pokemonsDisponiveis[i] = pokemons[i];
-        jogador2.pokemonsDisponiveis[i] = pokemons[i];
-    }
+    // Defina o nome dos jogadores
+    printf("Jogador 1 Digite seu nome: ");
+    scanf("%s", player1.nome);
+    printf("Jogador 2 Digite seu nome: ");
+    scanf("%s", player2.nome);
+    
 
-    jogador1.escolhasFeitas = 0;
-    jogador2.escolhasFeitas = 0;
+    // Jogador 1 e Jogador 2 escolhem pokémons alternadamente
+    printf("Escolha dos Pokémons\n\n");
+    
+    escolherPokemon(&player1, pokemonsDisponiveis, totalPokemons);
+    escolherPokemon(&player2, pokemonsDisponiveis, totalPokemons);
 
-    // Nome dos jogadores
-    printf("Jogador 1, insira seu nome: ");
-    fgets(jogador1.nome, maxCaracter, stdin);
-    jogador1.nome[strcspn(jogador1.nome, "\n")] = 0;
 
-    printf("Jogador 2, insira seu nome: ");
-    fgets(jogador2.nome, maxCaracter, stdin);
-    jogador2.nome[strcspn(jogador2.nome, "\n")] = 0;
+    // Exibe os pokémons escolhidos pelos jogadores
+    printf("\nPokémons escolhidos por %s:\n", player1.nome);
+    imprimirPokemons(player1.pokemonsEscolhidos, qntPokemon);
 
-    int opcaoMenu;
-    mostrarMenu();
-    printf("Escolha uma opção: ");
-    scanf("%d", &opcaoMenu);
+    printf("\nPokémons escolhidos por %s:\n", player2.nome);
+    imprimirPokemons(player2.pokemonsEscolhidos, qntPokemon);
 
-    switch (opcaoMenu) {
-        case 1:
-            jogo(jogador1, jogador2);
-            break;
-        case 2:
-            printf("Regras do jogo: Cada jogador escolhe um Pokémon e eles batalham até que um perca toda a vida.\n");
-            break;
-        case 3:
-            printf("Saindo do jogo. Até a próxima!\n");
-            break;
-        default:
-            printf("Opção inválida!\n");
-    }
+    system("clear");
+
+    pokemonEmCampo(player1);
+
+    pausar();
+    system("clear");
+
+    pokemonEmCampo(player2);
+
+
 
     return 0;
 }
