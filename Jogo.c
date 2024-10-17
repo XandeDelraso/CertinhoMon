@@ -15,6 +15,7 @@ typedef struct {
     char tipo[maxCaracter];
     int vida;
     char habilidades[qntSkills][maxCaracter];
+    int danoHabilidades[qntSkills];
 } pokemon;
 
 typedef struct {
@@ -100,27 +101,40 @@ void adicionarPokemonDerrotado(listaDePokemonsEnfretados* lista, pokemon novoPok
 }
 
 void inicializarPokemon(pokemon pokemons[]) {
+    // Inicializando o primeiro Pokémon
     strcpy(pokemons[0].nome, "Nome1");
     strcpy(pokemons[0].tipo, "Tipo1");
     pokemons[0].vida = 100;
     strcpy(pokemons[0].habilidades[0], "Habilidade 1");
+    pokemons[0].danoHabilidades[0] = 40; // Dano da habilidade 1
     strcpy(pokemons[0].habilidades[1], "Habilidade 2");
+    pokemons[0].danoHabilidades[1] = 30; // Dano da habilidade 2
     strcpy(pokemons[0].habilidades[2], "Habilidade 3");
+    pokemons[0].danoHabilidades[2] = 20; // Dano da habilidade 3
 
+    // Inicializando o segundo Pokémon
     strcpy(pokemons[1].nome, "Nome2");
     strcpy(pokemons[1].tipo, "Tipo2");
     pokemons[1].vida = 100;
     strcpy(pokemons[1].habilidades[0], "Habilidade 1");
+    pokemons[1].danoHabilidades[0] = 35; // Dano da habilidade 1
     strcpy(pokemons[1].habilidades[1], "Habilidade 2");
+    pokemons[1].danoHabilidades[1] = 25; // Dano da habilidade 2
     strcpy(pokemons[1].habilidades[2], "Habilidade 3");
+    pokemons[1].danoHabilidades[2] = 15; // Dano da habilidade 3
 
+    // Inicializando o terceiro Pokémon
     strcpy(pokemons[2].nome, "Nome3");
     strcpy(pokemons[2].tipo, "Tipo3");
     pokemons[2].vida = 100;
     strcpy(pokemons[2].habilidades[0], "Habilidade 1");
+    pokemons[2].danoHabilidades[0] = 50; // Dano da habilidade 1
     strcpy(pokemons[2].habilidades[1], "Habilidade 2");
+    pokemons[2].danoHabilidades[1] = 40; // Dano da habilidade 2
     strcpy(pokemons[2].habilidades[2], "Habilidade 3");
+    pokemons[2].danoHabilidades[2] = 30; // Dano da habilidade 3
 }
+
 
 void imprimirPokemons(pokemon pokemons[], int quantidade) {
     for (int i = 0; i < quantidade; i++) {
@@ -201,7 +215,8 @@ void combate(jogador* player1, jogador* player2){
     printf("\nEscolha de habilidade: ");
     scanf("%d", &escolhaAtaque);
 
-    printf("Ataque escolhido: ", player1->pokemonEmCampo.habilidades[escolhaAtaque]);
+    printf("Ataque escolhido: %s\n", &player1->pokemonEmCampo.habilidades[escolhaAtaque - 1]);
+    printf("O pokemon em campo do jogador %s ficou com %d de vida\n", player2->nome, player2->pokemonEmCampo.vida - player1->pokemonEmCampo.danoHabilidades[escolhaAtaque-1]);
 }
 
 int main() {
