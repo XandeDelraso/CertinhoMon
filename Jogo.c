@@ -9,6 +9,7 @@
 #define totalTipos 18
 #define danoBase 2
 
+
 typedef struct {
     char nome[maxCaracter];
     char tipo[maxCaracter];
@@ -22,6 +23,19 @@ typedef struct {
     int jaEscolhido[qntPokemon];
     pokemon pokemonEmCampo;
 } jogador;
+
+typedef struct
+{
+    pokemon* pokemons;
+    int tamanho;
+} listaDePokemonsEnfretados;
+
+listaDePokemonsEnfretados inicializarLista() {
+    listaDePokemonsEnfretados lista;
+    lista.pokemons = NULL;  // Inicialmente sem pokemons
+    lista.tamanho = 0;      // Tamanho inicial é zero
+    return lista;
+}
 
 // Tabela de efetividade dos tipos
 float tabelaEfetividade[totalTipos][totalTipos] = {
@@ -71,6 +85,18 @@ int calcularDano(const pokemon* atacante, const pokemon* defensor) {
     }
     efetividade = tabelaEfetividade[indiceAtacante][indiceDefensor];
     return danoBase * efetividade;
+}
+
+//Função que adiciona os pokemons derrotados pelo jogador em uma lista para printar depois
+void adicionarPokemonDerrotado(listaDePokemonsEnfretados* lista, pokemon novoPokemon){
+    lista->tamanho++;
+    lista->pokemons = (pokemon*)realloc(lista->pokemons, lista->tamanho * sizeof(pokemon));
+    if (lista->pokemons == NULL)
+    {
+        printf("Erro ao alocar memória\n");
+        exit(1);
+    }
+    lista->pokemons[lista->tamanho - 1] = novoPokemon;   
 }
 
 void inicializarPokemon(pokemon pokemons[]) {
@@ -136,34 +162,21 @@ void escolherPokemon(jogador *player, pokemon pokemonsDisponiveis[], int totalDi
         }
     }
 }
-/*
-void imprimirPokemonsEscolhidos(jogador player, int quantidade){
-    for (int i = 0; i < quantidade; i++)
-    {
-        printf("pokemon: %d\n Nome: %s - Tipo: %s - Vida: %d\n Habilidades:",i + 1, player.pokemonsEscolhidos[i].nome, player.pokemonsEscolhidos[i].tipo, player.pokemonsEscolhidos[i].vida);
-        for (int j = 0; i < qntSkills; j++)
-        {
-            printf(" %s", player.pokemonsEscolhidos[j].habilidades);
-        }
-        printf("/n/n");
-    }
-    
-}
-*/
 
-void pokemonEmCampo(jogador player){
+
+void pokemonEmCampo(jogador* player){
     int escolha = 0;
-    imprimirPokemons(player.pokemonsEscolhidos, qntPokemon);
-    printf("Jogador %s escolha o pokemon em Campo: ", player.nome);
+    imprimirPokemons(player->pokemonsEscolhidos, qntPokemon);
+    printf("Jogador %s escolha o pokemon em Campo: ", player->nome);
     scanf("%d", &escolha);
 
     for (int i = 0; i <= escolha; i++)
     {
-        player.pokemonEmCampo = player.pokemonsEscolhidos[i - 1];
+        player->pokemonEmCampo = player->pokemonsEscolhidos[i - 1];
     }
     
 
-    printf("O jogador %s escolheu o pokemon %s\n", player.nome, player.pokemonEmCampo.nome);
+    printf("O jogador %s escolheu o pokemon %s\n", player->nome, player->pokemonEmCampo.nome);
     
 }
 
@@ -173,8 +186,27 @@ void pausar() {
     getchar();  // Aguarda o Enter do usuário
 }
 
+void combate(jogador* player1, jogador* player2){
+    int escolhaAtaque;
+        printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
+
+    printf("Escolha qual ataque fazer: \n");
+    for (int i = 0; i < qntSkills; i++)
+    {
+        printf("%s\n", player1->pokemonEmCampo.habilidades[i]);
+    }
+    
+    printf("Vida do pokemon adversário %d e o tipo %s", player2->pokemonEmCampo.vida, player2->pokemonEmCampo.tipo);
+    
+    printf("\nEscolha de habilidade: ");
+    scanf("%d", &escolhaAtaque);
+
+    printf("Ataque escolhido: ", player1->pokemonEmCampo.habilidades[escolhaAtaque]);
+}
+
 int main() {
     jogador player1, player2;
+    listaDePokemonsEnfretados pokemonsDerrotados = inicializarLista();
     pokemon pokemonsDisponiveis[totalPokemons];
     int jaEscolhido[totalPokemons] = {0};  // Array para rastrear pokémons já escolhidos
 
@@ -186,9 +218,8 @@ int main() {
     scanf("%s", player1.nome);
     printf("Jogador 2 Digite seu nome: ");
     scanf("%s", player2.nome);
-    
 
-    // Jogador 1 e Jogador 2 escolhem pokémons alternadamente
+        // Jogador 1 e Jogador 2 escolhem pokémons alternadamente
     printf("Escolha dos Pokémons\n\n");
     
     escolherPokemon(&player1, pokemonsDisponiveis, totalPokemons);
@@ -204,13 +235,17 @@ int main() {
 
     system("clear");
 
-    pokemonEmCampo(player1);
+    pokemonEmCampo(&player1);
 
     pausar();
     system("clear");
 
-    pokemonEmCampo(player2);
+    pokemonEmCampo(&player2);
 
+    system("clear");
+
+
+    combate(&player1, &player2);
 
 
     return 0;
