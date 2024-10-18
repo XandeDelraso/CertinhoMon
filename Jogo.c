@@ -9,17 +9,17 @@
 #define totalTipos 18
 #define danoBase 2
 
-typedef struct{
-    nome[maxCaracter];
-    tipo[maxCaracter];
+typedef struct {
+    char nome[maxCaracter];
+    char tipo[maxCaracter];
     int dano;
-}habilidades;
+}habilidade;
 
 typedef struct {
     char nome[maxCaracter];
     char tipo[maxCaracter];
     int vida;
-    char habilidades[qntSkills][maxCaracter];
+    habilidade habilidades[qntSkills];
     int danoHabilidades[qntSkills];
 } pokemon;
 
@@ -43,11 +43,19 @@ listaDePokemonsEnfretados inicializarLista() {
     return lista;
 }
 
+// Função para inicializar uma habilidade
+void inicializarHabilidade(habilidade* h, const char* nome, const char* tipo, int dano) {
+    strcpy(h->nome, nome);
+    strcpy(h->tipo, tipo);
+    h->dano = dano;
+}
+
+
 // Tabela de efetividade dos tipos
 float tabelaEfetividade[totalTipos][totalTipos] = {
     // Normal, Fogo, Água, Planta, Elétrico, Gelo, Lutador, Venenoso, Terra, Voador, Psíquico, Inseto, Rocha, Fantasma, Dragão, Sombrio, Fada
     { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Normal
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Fogo
+    { 1,   1,   3,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Fogo
     { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Água
     { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Planta
     { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Elétrico
@@ -80,17 +88,17 @@ int encontrarTipo(const char* tipo) {
     return -1; // Tipo não encontrado
 }
 
-int calcularDano(const pokemon* atacante, const pokemon* defensor) {
-    int indiceAtacante = encontrarTipo(atacante->tipo);
-    int indiceDefensor = encontrarTipo(defensor->tipo);
-    float efetividade;
+// Função para obter a efetividade do ataque
+float obterEfetividade(const char* tipoAtacante, const char* tipoDefensivo) {
+    int indiceAtacante = encontrarTipo(tipoAtacante);
+    int indiceDefensivo = encontrarTipo(tipoDefensivo);
 
-    if (indiceAtacante == -1 || indiceDefensor == -1) {
-        printf("Tipos inexistentes na matriz");
-        return danoBase;
+    if (indiceAtacante != -1 && indiceDefensivo != -1) {
+        printf("Índice do tipo atacante (%s): %d\n", tipoAtacante, indiceAtacante);
+        printf("Índice do tipo defensivo (%s): %d\n", tipoDefensivo, indiceDefensivo);
+        return tabelaEfetividade[indiceAtacante][indiceDefensivo];
     }
-    efetividade = tabelaEfetividade[indiceAtacante][indiceDefensor];
-    return danoBase * efetividade;
+    return 1; // Retorna 1 se não encontrar algum dos tipos
 }
 
 //Função que adiciona os pokemons derrotados pelo jogador em uma lista para printar depois
@@ -108,59 +116,27 @@ void adicionarPokemonDerrotado(listaDePokemonsEnfretados* lista, pokemon novoPok
 void inicializarPokemon(pokemon pokemons[]) {
     // Inicializando o primeiro Pokémon
     strcpy(pokemons[0].nome, "Nome1");
-    strcpy(pokemons[0].tipo, "Tipo1");
+    strcpy(pokemons[0].tipo, "Fogo");
     pokemons[0].vida = 100;
-    strcpy(pokemons[0].habilidades[0], "Habilidade 1");
-    pokemons[0].danoHabilidades[0] = 40; // Dano da habilidade 1
-    strcpy(pokemons[0].habilidades[1], "Habilidade 2");
-    pokemons[0].danoHabilidades[1] = 30; // Dano da habilidade 2
-    strcpy(pokemons[0].habilidades[2], "Habilidade 3");
-    pokemons[0].danoHabilidades[2] = 20; // Dano da habilidade 3
+    inicializarHabilidade(&pokemons[0].habilidades[0], "Habilidade 1", "Fogo", 40);
+    inicializarHabilidade(&pokemons[0].habilidades[1], "Habilidade 2", "Agua", 30);
+    inicializarHabilidade(&pokemons[0].habilidades[2], "Habilidade 3", "Terra", 20);
 
     // Inicializando o segundo Pokémon
     strcpy(pokemons[1].nome, "Nome2");
     strcpy(pokemons[1].tipo, "Tipo2");
     pokemons[1].vida = 100;
-    strcpy(pokemons[1].habilidades[0], "Habilidade 1");
-    pokemons[1].danoHabilidades[0] = 35; // Dano da habilidade 1
-    strcpy(pokemons[1].habilidades[1], "Habilidade 2");
-    pokemons[1].danoHabilidades[1] = 25; // Dano da habilidade 2
-    strcpy(pokemons[1].habilidades[2], "Habilidade 3");
-    pokemons[1].danoHabilidades[2] = 15; // Dano da habilidade 3
+    inicializarHabilidade(&pokemons[1].habilidades[0], "Habilidade 1", "Vento", 35);
+    inicializarHabilidade(&pokemons[1].habilidades[1], "Habilidade 2", "Eletrico", 25);
+    inicializarHabilidade(&pokemons[1].habilidades[2], "Habilidade 3", "Gelo", 15);
 
     // Inicializando o terceiro Pokémon
     strcpy(pokemons[2].nome, "Nome3");
     strcpy(pokemons[2].tipo, "Tipo3");
     pokemons[2].vida = 100;
-    strcpy(pokemons[2].habilidades[0], "Habilidade 1");
-    pokemons[2].danoHabilidades[0] = 50; // Dano da habilidade 1
-    strcpy(pokemons[2].habilidades[1], "Habilidade 2");
-    pokemons[2].danoHabilidades[1] = 40; // Dano da habilidade 2
-    strcpy(pokemons[2].habilidades[2], "Habilidade 3");
-    pokemons[2].danoHabilidades[2] = 30; // Dano da habilidade 3
-}
-
-float calcularMultiplicadorDeDano(char tipoAtacante[], char tipoDefensor[]) {
-    if (strcmp(tipoAtacante, "Fogo") == 0) {
-        if (strcmp(tipoDefensor, "Planta") == 0) {
-            return 2.0;  // Fogo é forte contra Planta
-        } else if (strcmp(tipoDefensor, "Água") == 0) {
-            return 0.5;  // Fogo é fraco contra Água
-        }
-    } else if (strcmp(tipoAtacante, "Água") == 0) {
-        if (strcmp(tipoDefensor, "Fogo") == 0) {
-            return 2.0;  // Água é forte contra Fogo
-        } else if (strcmp(tipoDefensor, "Planta") == 0) {
-            return 0.5;  // Água é fraco contra Planta
-        }
-    } else if (strcmp(tipoAtacante, "Planta") == 0) {
-        if (strcmp(tipoDefensor, "Água") == 0) {
-            return 2.0;  // Planta é forte contra Água
-        } else if (strcmp(tipoDefensor, "Fogo") == 0) {
-            return 0.5;  // Planta é fraco contra Fogo
-        }
-    }
-    return 1.0;  // Se não houver vantagem ou desvantagem, o multiplicador é 1
+    inicializarHabilidade(&pokemons[2].habilidades[0], "Habilidade 1", "Fogo", 50);
+    inicializarHabilidade(&pokemons[2].habilidades[1], "Habilidade 2", "Agua", 40);
+    inicializarHabilidade(&pokemons[2].habilidades[2], "Habilidade 3", "Terra", 30);
 }
 
 
@@ -169,11 +145,15 @@ void imprimirPokemons(pokemon pokemons[], int quantidade) {
         printf("Pokemon %d: \nNome: %s - Tipo: %s - Vida: %d \nHabilidades: ", 
                 i + 1, pokemons[i].nome, pokemons[i].tipo, pokemons[i].vida);
         for (int j = 0; j < qntSkills; j++) {
-            printf(" %s,", pokemons[i].habilidades[j]);
+            printf("%s (Dano: %d)", pokemons[i].habilidades[j].nome, pokemons[i].habilidades[j].dano);
+            if (j < qntSkills - 1) {
+                printf(", ");  // Adiciona uma vírgula entre as habilidades, mas não após a última
+            }
         }
         printf("\n\n");
     }
 }
+
 
 
 void escolherPokemon(jogador *player, pokemon pokemonsDisponiveis[], int totalDisponiveis) {
@@ -206,21 +186,21 @@ void escolherPokemon(jogador *player, pokemon pokemonsDisponiveis[], int totalDi
 }
 
 
-void pokemonEmCampo(jogador* player){
+void pokemonEmCampo(jogador* player) {
     int escolha = 0;
     imprimirPokemons(player->pokemonsEscolhidos, qntPokemon);
-    printf("Jogador %s escolha o pokemon em Campo: ", player->nome);
+    printf("Jogador %s escolha o pokemon em Campo (1 a %d): ", player->nome, qntPokemon);
     scanf("%d", &escolha);
 
-    for (int i = 0; i <= escolha; i++)
-    {
-        player->pokemonEmCampo = player->pokemonsEscolhidos[i - 1];
+    // Corrige o acesso ao índice
+    if (escolha >= 1 && escolha <= qntPokemon) {
+        player->pokemonEmCampo = player->pokemonsEscolhidos[escolha - 1];
+        printf("O jogador %s escolheu o pokemon %s\n", player->nome, player->pokemonEmCampo.nome);
+    } else {
+        printf("Escolha inválida.\n");
     }
-    
-
-    printf("O jogador %s escolheu o pokemon %s\n", player->nome, player->pokemonEmCampo.nome);
-    
 }
+
 
 void pausar() {
     printf("\nPressione Enter para continuar...");
@@ -228,31 +208,33 @@ void pausar() {
     getchar();  // Aguarda o Enter do usuário
 }
 
-void combate(jogador* player1, jogador* player2){
-    int escolhaAtaque;
-        printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
 
-    printf("Escolha qual ataque fazer: \n");
-    for (int i = 0; i < qntSkills; i++)
-    {
-        printf("%s\n", player1->pokemonEmCampo.habilidades[i]);
+void combate(jogador* player1, jogador* player2) {
+    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
+    
+    printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
+    printf("Escolha qual ataque fazer:\n");
+    for (int i = 0; i < qntSkills; i++) {
+        printf("%d: %s (Dano: %d)\n", i + 1, player1->pokemonEmCampo.habilidades[i].nome, player1->pokemonEmCampo.habilidades[i].dano);
     }
-    
-    printf("Vida do pokemon adversário %d e o tipo %s", player2->pokemonEmCampo.vida, player2->pokemonEmCampo.tipo);
-    
-    printf("\nEscolha de habilidade: ");
+
+    int escolhaAtaque;
     scanf("%d", &escolhaAtaque);
+    
+    if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
+        printf("Escolha de ataque inválida.\n");
+        return;
+    }
 
+    // Aqui você pode aplicar o dano ao Pokémon do adversário
+    int multiplicador = obterEfetividade(player1->pokemonEmCampo.habilidades->tipo, player2->pokemonEmCampo.tipo);
+    player2->pokemonEmCampo.vida -= player1->pokemonEmCampo.habilidades->dano * multiplicador;
+    
+    printf("O Pokémon %s sofreu %d de dano!\n", player2->pokemonEmCampo.nome, player1->pokemonEmCampo.habilidades->dano * multiplicador);
 
-
-    printf("Ataque escolhido: %s\n", &player1->pokemonEmCampo.habilidades[escolhaAtaque - 1]);
-
-    float multiplicador = calcularMultiplicadorDeDano(player1->pokemonEmCampo.tipo, player2->pokemonEmCampo.tipo);
-    int dano = player1->pokemonEmCampo.danoHabilidades[escolhaAtaque - 1] * multiplicador;
-    player2->pokemonEmCampo.vida -= dano;
-
-    printf("O pokemon em campo do jogador %s ficou com %d de vida\n", player2->nome, player2->pokemonEmCampo.vida);
+    printf("Vida do pokemon em campo de %s: %d", player2->nome, player2->pokemonEmCampo.vida);
 }
+
 
 int main() {
     jogador player1, player2;
