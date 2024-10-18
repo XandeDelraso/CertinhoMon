@@ -6,7 +6,7 @@
 #define totalPokemons 3
 #define qntSkills 3
 #define qntPokemon 2
-#define totalTipos 18
+#define totalTipos 17
 #define danoBase 2
 
 typedef struct {
@@ -20,7 +20,6 @@ typedef struct {
     char tipo[maxCaracter];
     int vida;
     habilidade habilidades[qntSkills];
-    int danoHabilidades[qntSkills];
 } pokemon;
 
 typedef struct {
@@ -51,54 +50,64 @@ void inicializarHabilidade(habilidade* h, const char* nome, const char* tipo, in
 }
 
 
-// Tabela de efetividade dos tipos
-float tabelaEfetividade[totalTipos][totalTipos] = {
-    // Normal, Fogo, Água, Planta, Elétrico, Gelo, Lutador, Venenoso, Terra, Voador, Psíquico, Inseto, Rocha, Fantasma, Dragão, Sombrio, Fada
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Normal
-    { 1,   1,   3,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Fogo
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Água
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Planta
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Elétrico
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Gelo
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Lutador
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Venenoso
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Terra
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Voador
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Psíquico
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Inseto
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Rocha
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Fantasma
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Dragão
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }, // Sombrio
-    { 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1 }  // Fada
+// Definições dos tipos como strings
+char* nomesTipos[totalTipos] = {
+    "Normal", "Fogo", "Agua", "Planta", "Eletrico",
+    "Gelo", "Lutador", "Venenoso", "Terra", "Voador",
+    "Psiquico", "Inseto", "Rocha", "Fantasma", "Dragao",
+    "Sombrio", "Fada"
 };
 
-// Função para encontrar o tipo do Pokémon
-int encontrarTipo(const char* tipo) {
-    const char* tipos[totalTipos] = {
-        "Normal", "Fogo", "Água", "Planta", "Elétrico", "Gelo", "Lutador", "Venenoso", "Terra", "Voador",
-        "Psíquico", "Inseto", "Rocha", "Fantasma", "Dragão", "Sombrio", "Fada"
-    };
+// Tabela de efetividade dos tipos
+int tabelaEfetividade[totalTipos][totalTipos] = {
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Normal
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Fogo
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Água
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Planta
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Elétrico
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Gelo
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Lutador
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Venenoso
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Terra
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Voador
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Psíquico
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Inseto
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Rocha
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Fantasma
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Dragão
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Sombrio
+    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }  // Fada
+};
 
+
+// Função que retorna o índice do tipo ou -1 se não encontrado
+int retornaIndiceTipo(char* tipo) {
+    // Itera sobre a lista de nomes para verificar se o tipo existe
     for (int i = 0; i < totalTipos; i++) {
-        if (strcmp(tipo, tipos[i]) == 0) {
-            return i;
+        if (strcmp(nomesTipos[i], tipo) == 0) {
+            return i; // Retorna o índice quando o tipo é encontrado
         }
     }
-    return -1; // Tipo não encontrado
+
+    return -1; // Retorna -1 se o tipo não for encontrado
 }
 
-// Função para obter a efetividade do ataque
-float obterEfetividade(const char* tipoAtacante, const char* tipoDefensivo) {
-    int indiceAtacante = encontrarTipo(tipoAtacante);
-    int indiceDefensivo = encontrarTipo(tipoDefensivo);
-
-    if (indiceAtacante != -1 && indiceDefensivo != -1) {
-        printf("Índice do tipo atacante (%s): %d\n", tipoAtacante, indiceAtacante);
-        printf("Índice do tipo defensivo (%s): %d\n", tipoDefensivo, indiceDefensivo);
-        return tabelaEfetividade[indiceAtacante][indiceDefensivo];
+// Função para calcular a efetividade do ataque
+int calcularEfetividade(pokemon* Atacante, pokemon* Defensor) {
+    int tipoAtacante = retornaIndiceTipo(Atacante->habilidades->tipo);
+    int tipoDefensor = retornaIndiceTipo(Defensor->tipo);
+    
+    if (tipoAtacante == -1) {
+        printf("Tipo do atacante '%s' não encontrado.\n", Atacante->habilidades->tipo);
+        return 1; 
     }
-    return 1; // Retorna 1 se não encontrar algum dos tipos
+    
+    if (tipoDefensor == -1) {
+        printf("Tipo do defensor '%s' não encontrado.\n", Defensor->tipo);
+        return 1; 
+    }
+    
+    return tabelaEfetividade[tipoAtacante][tipoDefensor];
 }
 
 //Função que adiciona os pokemons derrotados pelo jogador em uma lista para printar depois
@@ -124,7 +133,7 @@ void inicializarPokemon(pokemon pokemons[]) {
 
     // Inicializando o segundo Pokémon
     strcpy(pokemons[1].nome, "Nome2");
-    strcpy(pokemons[1].tipo, "Tipo2");
+    strcpy(pokemons[1].tipo, "Agua");
     pokemons[1].vida = 100;
     inicializarHabilidade(&pokemons[1].habilidades[0], "Habilidade 1", "Vento", 35);
     inicializarHabilidade(&pokemons[1].habilidades[1], "Habilidade 2", "Eletrico", 25);
@@ -132,7 +141,7 @@ void inicializarPokemon(pokemon pokemons[]) {
 
     // Inicializando o terceiro Pokémon
     strcpy(pokemons[2].nome, "Nome3");
-    strcpy(pokemons[2].tipo, "Tipo3");
+    strcpy(pokemons[2].tipo, "Terra");
     pokemons[2].vida = 100;
     inicializarHabilidade(&pokemons[2].habilidades[0], "Habilidade 1", "Fogo", 50);
     inicializarHabilidade(&pokemons[2].habilidades[1], "Habilidade 2", "Agua", 40);
@@ -209,31 +218,65 @@ void pausar() {
 }
 
 
+#include <stdio.h>
+
+// Supondo que já exista a definição das structs jogador, habilidade e outras variáveis necessárias.
+
+void exibirHabilidades(jogador* player) {
+    printf("Escolha qual ataque fazer:\n");
+    for (int i = 0; i < qntSkills; i++) {
+        printf("%d: %s (Dano: %d)\n", i + 1, player->pokemonEmCampo.habilidades[i].nome, player->pokemonEmCampo.habilidades[i].dano);
+    }
+}
+
+int escolherAtaque() {
+    int escolhaAtaque;
+    scanf("%d", &escolhaAtaque);
+    return escolhaAtaque;
+}
+
+void aplicarDano(jogador* atacante, jogador* defensor, int ataqueIndex) {
+    int multiplicador = calcularEfetividade(&atacante->pokemonEmCampo, &defensor->pokemonEmCampo);
+    int danoCalculado = atacante->pokemonEmCampo.habilidades[ataqueIndex].dano * multiplicador;
+    defensor->pokemonEmCampo.vida -= danoCalculado;
+
+    printf("O Pokémon %s sofreu %d de dano!\n", defensor->pokemonEmCampo.nome, danoCalculado);
+    printf("Vida do pokemon em campo de %s: %d\n", defensor->nome, defensor->pokemonEmCampo.vida);
+}
+
 void combate(jogador* player1, jogador* player2) {
+    int escolhaAtaque;
     printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
     
     printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
-    printf("Escolha qual ataque fazer:\n");
-    for (int i = 0; i < qntSkills; i++) {
-        printf("%d: %s (Dano: %d)\n", i + 1, player1->pokemonEmCampo.habilidades[i].nome, player1->pokemonEmCampo.habilidades[i].dano);
-    }
+    
+    exibirHabilidades(player1);
 
-    int escolhaAtaque;
-    scanf("%d", &escolhaAtaque);
+    escolhaAtaque = escolherAtaque();
     
     if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
         printf("Escolha de ataque inválida.\n");
         return;
     }
 
-    // Aqui você pode aplicar o dano ao Pokémon do adversário
-    int multiplicador = obterEfetividade(player1->pokemonEmCampo.habilidades->tipo, player2->pokemonEmCampo.tipo);
-    player2->pokemonEmCampo.vida -= player1->pokemonEmCampo.habilidades->dano * multiplicador;
+    aplicarDano(player1, player2, escolhaAtaque - 1);  // Subtraímos 1 para ajustar ao índice do vetor
+    pausar();
+    system("clear");
+    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
     
-    printf("O Pokémon %s sofreu %d de dano!\n", player2->pokemonEmCampo.nome, player1->pokemonEmCampo.habilidades->dano * multiplicador);
+    printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
+    
+    exibirHabilidades(player1);
 
-    printf("Vida do pokemon em campo de %s: %d", player2->nome, player2->pokemonEmCampo.vida);
+    escolhaAtaque = escolherAtaque();
+    
+    if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
+        printf("Escolha de ataque inválida.\n");
+        return;
+    }
+    aplicarDano(player1, player2, escolhaAtaque - 1); 
 }
+
 
 
 int main() {
@@ -276,9 +319,9 @@ int main() {
 
     system("clear");
 
-
     combate(&player1, &player2);
 
 
     return 0;
+    
 }
