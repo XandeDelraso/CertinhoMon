@@ -9,6 +9,11 @@
 #define totalTipos 18
 #define danoBase 2
 
+typedef struct{
+    nome[maxCaracter];
+    tipo[maxCaracter];
+    int dano;
+}habilidades;
 
 typedef struct {
     char nome[maxCaracter];
@@ -135,6 +140,29 @@ void inicializarPokemon(pokemon pokemons[]) {
     pokemons[2].danoHabilidades[2] = 30; // Dano da habilidade 3
 }
 
+float calcularMultiplicadorDeDano(char tipoAtacante[], char tipoDefensor[]) {
+    if (strcmp(tipoAtacante, "Fogo") == 0) {
+        if (strcmp(tipoDefensor, "Planta") == 0) {
+            return 2.0;  // Fogo é forte contra Planta
+        } else if (strcmp(tipoDefensor, "Água") == 0) {
+            return 0.5;  // Fogo é fraco contra Água
+        }
+    } else if (strcmp(tipoAtacante, "Água") == 0) {
+        if (strcmp(tipoDefensor, "Fogo") == 0) {
+            return 2.0;  // Água é forte contra Fogo
+        } else if (strcmp(tipoDefensor, "Planta") == 0) {
+            return 0.5;  // Água é fraco contra Planta
+        }
+    } else if (strcmp(tipoAtacante, "Planta") == 0) {
+        if (strcmp(tipoDefensor, "Água") == 0) {
+            return 2.0;  // Planta é forte contra Água
+        } else if (strcmp(tipoDefensor, "Fogo") == 0) {
+            return 0.5;  // Planta é fraco contra Fogo
+        }
+    }
+    return 1.0;  // Se não houver vantagem ou desvantagem, o multiplicador é 1
+}
+
 
 void imprimirPokemons(pokemon pokemons[], int quantidade) {
     for (int i = 0; i < quantidade; i++) {
@@ -215,8 +243,15 @@ void combate(jogador* player1, jogador* player2){
     printf("\nEscolha de habilidade: ");
     scanf("%d", &escolhaAtaque);
 
+
+
     printf("Ataque escolhido: %s\n", &player1->pokemonEmCampo.habilidades[escolhaAtaque - 1]);
-    printf("O pokemon em campo do jogador %s ficou com %d de vida\n", player2->nome, player2->pokemonEmCampo.vida - player1->pokemonEmCampo.danoHabilidades[escolhaAtaque-1]);
+
+    float multiplicador = calcularMultiplicadorDeDano(player1->pokemonEmCampo.tipo, player2->pokemonEmCampo.tipo);
+    int dano = player1->pokemonEmCampo.danoHabilidades[escolhaAtaque - 1] * multiplicador;
+    player2->pokemonEmCampo.vida -= dano;
+
+    printf("O pokemon em campo do jogador %s ficou com %d de vida\n", player2->nome, player2->pokemonEmCampo.vida);
 }
 
 int main() {
