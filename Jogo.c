@@ -60,9 +60,9 @@ char* nomesTipos[totalTipos] = {
 
 // Tabela de efetividade dos tipos
 int tabelaEfetividade[totalTipos][totalTipos] = {
-    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Normal
-    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Fogo
-    { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Água
+    { 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Normal
+    { 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Fogo
+    { 2, 3, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Água
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Planta
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Elétrico
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // Gelo
@@ -90,24 +90,6 @@ int retornaIndiceTipo(char* tipo) {
     }
 
     return -1; // Retorna -1 se o tipo não for encontrado
-}
-
-// Função para calcular a efetividade do ataque
-int calcularEfetividade(pokemon* Atacante, pokemon* Defensor) {
-    int tipoAtacante = retornaIndiceTipo(Atacante->habilidades->tipo);
-    int tipoDefensor = retornaIndiceTipo(Defensor->tipo);
-    
-    if (tipoAtacante == -1) {
-        printf("Tipo do atacante '%s' não encontrado.\n", Atacante->habilidades->tipo);
-        return 1; 
-    }
-    
-    if (tipoDefensor == -1) {
-        printf("Tipo do defensor '%s' não encontrado.\n", Defensor->tipo);
-        return 1; 
-    }
-    
-    return tabelaEfetividade[tipoAtacante][tipoDefensor];
 }
 
 //Função que adiciona os pokemons derrotados pelo jogador em uma lista para printar depois
@@ -218,10 +200,6 @@ void pausar() {
 }
 
 
-#include <stdio.h>
-
-// Supondo que já exista a definição das structs jogador, habilidade e outras variáveis necessárias.
-
 void exibirHabilidades(jogador* player) {
     printf("Escolha qual ataque fazer:\n");
     for (int i = 0; i < qntSkills; i++) {
@@ -236,12 +214,17 @@ int escolherAtaque() {
 }
 
 void aplicarDano(jogador* atacante, jogador* defensor, int ataqueIndex) {
-    int multiplicador = calcularEfetividade(&atacante->pokemonEmCampo, &defensor->pokemonEmCampo);
+        // Obtenha o índice do tipo atacante
+    int tipoAtacante = retornaIndiceTipo(atacante->pokemonEmCampo.habilidades[ataqueIndex].tipo);
+    // Obtenha o índice do tipo defensor
+    int tipoDefensor = retornaIndiceTipo(defensor->pokemonEmCampo.tipo);
+    int multiplicador = tabelaEfetividade[tipoAtacante][tipoDefensor];
     int danoCalculado = atacante->pokemonEmCampo.habilidades[ataqueIndex].dano * multiplicador;
     defensor->pokemonEmCampo.vida -= danoCalculado;
 
     printf("O Pokémon %s sofreu %d de dano!\n", defensor->pokemonEmCampo.nome, danoCalculado);
     printf("Vida do pokemon em campo de %s: %d\n", defensor->nome, defensor->pokemonEmCampo.vida);
+
 }
 
 void combate(jogador* player1, jogador* player2) {
@@ -260,21 +243,7 @@ void combate(jogador* player1, jogador* player2) {
     }
 
     aplicarDano(player1, player2, escolhaAtaque - 1);  // Subtraímos 1 para ajustar ao índice do vetor
-    pausar();
-    system("clear");
-    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
     
-    printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
-    
-    exibirHabilidades(player1);
-
-    escolhaAtaque = escolherAtaque();
-    
-    if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
-        printf("Escolha de ataque inválida.\n");
-        return;
-    }
-    aplicarDano(player1, player2, escolhaAtaque - 1); 
 }
 
 
@@ -318,9 +287,10 @@ int main() {
     pokemonEmCampo(&player2);
 
     system("clear");
+    
+
 
     combate(&player1, &player2);
-
 
     return 0;
     
