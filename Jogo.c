@@ -20,6 +20,7 @@ typedef struct {
     char tipo[maxCaracter];
     int vida;
     habilidade habilidades[qntSkills];
+    int vivo; // 0 = morto e 1 = vivo
 } pokemon;
 
 typedef struct {
@@ -27,6 +28,8 @@ typedef struct {
     pokemon pokemonsEscolhidos[qntPokemon];
     int jaEscolhido[qntPokemon];
     pokemon pokemonEmCampo;
+    pokemon pokmonsMortos[qntPokemon];
+    int pokemonsVivos;
 } jogador;
 
 typedef struct
@@ -109,6 +112,7 @@ void inicializarPokemon(pokemon pokemons[]) {
     strcpy(pokemons[0].nome, "Nome1");
     strcpy(pokemons[0].tipo, "Fogo");
     pokemons[0].vida = 100;
+    pokemons[0].vivo = 1;  // O Pokémon começa vivo
     inicializarHabilidade(&pokemons[0].habilidades[0], "Habilidade 1", "Fogo", 40);
     inicializarHabilidade(&pokemons[0].habilidades[1], "Habilidade 2", "Agua", 30);
     inicializarHabilidade(&pokemons[0].habilidades[2], "Habilidade 3", "Terra", 20);
@@ -117,6 +121,7 @@ void inicializarPokemon(pokemon pokemons[]) {
     strcpy(pokemons[1].nome, "Nome2");
     strcpy(pokemons[1].tipo, "Agua");
     pokemons[1].vida = 100;
+    pokemons[1].vivo = 1;  // O Pokémon começa vivo
     inicializarHabilidade(&pokemons[1].habilidades[0], "Habilidade 1", "Vento", 35);
     inicializarHabilidade(&pokemons[1].habilidades[1], "Habilidade 2", "Eletrico", 25);
     inicializarHabilidade(&pokemons[1].habilidades[2], "Habilidade 3", "Gelo", 15);
@@ -125,10 +130,12 @@ void inicializarPokemon(pokemon pokemons[]) {
     strcpy(pokemons[2].nome, "Nome3");
     strcpy(pokemons[2].tipo, "Terra");
     pokemons[2].vida = 100;
+    pokemons[2].vivo = 1;  // O Pokémon começa vivo
     inicializarHabilidade(&pokemons[2].habilidades[0], "Habilidade 1", "Fogo", 50);
     inicializarHabilidade(&pokemons[2].habilidades[1], "Habilidade 2", "Agua", 40);
     inicializarHabilidade(&pokemons[2].habilidades[2], "Habilidade 3", "Terra", 30);
 }
+
 
 
 void imprimirPokemons(pokemon pokemons[], int quantidade) {
@@ -144,6 +151,35 @@ void imprimirPokemons(pokemon pokemons[], int quantidade) {
         printf("\n\n");
     }
 }
+
+void derrotarPokemon(pokemon *pokemon) {
+    if (pokemon->vida <= 0) {
+        pokemon->vivo = 0;  // Marca como morto
+    }
+}
+
+void imprimirPokemonsVivos(pokemon pokemons[], int quantidade) {
+    int contador = 1;  // Usado para numerar os Pokémons vivos corretamente
+    for (int i = 0; i < quantidade; i++) {
+        if (pokemons[i].vivo == 1) {  // Verifica se o Pokémon está vivo
+            printf("Pokemon %d: \nNome: %s - Tipo: %s - Vida: %d \nHabilidades: ", 
+                    contador, pokemons[i].nome, pokemons[i].tipo, pokemons[i].vida);
+            for (int j = 0; j < qntSkills; j++) {
+                printf("%s (Dano: %d)", pokemons[i].habilidades[j].nome, pokemons[i].habilidades[j].dano);
+                if (j < qntSkills - 1) {
+                    printf(", ");  // Adiciona uma vírgula entre as habilidades, mas não após a última
+                }
+            }
+            printf("\n\n");
+            contador++;  // Incrementa o número para o próximo Pokémon vivo
+        }
+    }
+
+    if (contador == 1) {
+        printf("Nenhum Pokémon vivo.\n");  // Se nenhum Pokémon estiver vivo
+    }
+}
+
 
 
 
@@ -179,18 +215,40 @@ void escolherPokemon(jogador *player, pokemon pokemonsDisponiveis[], int totalDi
 
 void pokemonEmCampo(jogador* player) {
     int escolha = 0;
-    imprimirPokemons(player->pokemonsEscolhidos, qntPokemon);
-    printf("Jogador %s escolha o pokemon em Campo (1 a %d): ", player->nome, qntPokemon);
-    scanf("%d", &escolha);
+    int num = 0;
 
-    // Corrige o acesso ao índice
-    if (escolha >= 1 && escolha <= qntPokemon) {
-        player->pokemonEmCampo = player->pokemonsEscolhidos[escolha - 1];
-        printf("O jogador %s escolheu o pokemon %s\n", player->nome, player->pokemonEmCampo.nome);
-    } else {
-        printf("Escolha inválida.\n");
+    // Contar quantos pokémons estão vivos
+    for (int i = 0; i < qntPokemon; i++) {
+        if (player->pokemonsEscolhidos[i].vida > 0) {
+            num++;
+        }
     }
+
+    // Verificar se há pokémons vivos
+    if (num == 0) {
+        printf("Todos os pokémons de %s estão desmaiados.\n", player->nome);
+        return;
+    }
+
+    // Imprimir pokémons vivos
+    imprimirPokemonsVivos(player->pokemonsEscolhidos, qntPokemon);
+
+    // Repetir até que o jogador faça uma escolha válida
+    do {
+        printf("Jogador %s, escolha o pokémon em campo (1 a %d): ", player->nome, num);
+        scanf("%d", &escolha);
+
+        if (escolha >= 1 && escolha <= num) {
+            player->pokemonEmCampo = player->pokemonsEscolhidos[escolha - 1];
+            printf("O jogador %s escolheu o pokémon %s\n", player->nome, player->pokemonEmCampo.nome);
+        } else {
+            printf("Escolha inválida. Tente novamente.\n");
+        }
+
+    } while (escolha < 1 || escolha > num);
 }
+
+
 
 
 void pausar() {
@@ -227,9 +285,59 @@ void aplicarDano(jogador* atacante, jogador* defensor, int ataqueIndex) {
 
 }
 
+void removerPokemonEscolhido(jogador* player, pokemon pokemonMorto) {
+    for (int i = 0; i < qntPokemon; i++) {
+        if (strcmp(player->pokemonsEscolhidos[i].nome, pokemonMorto.nome) == 0) {
+            // Remover o Pokémon e reorganizar o array
+            for (int j = i; j < qntPokemon - 1; j++) {
+                player->pokemonsEscolhidos[j] = player->pokemonsEscolhidos[j + 1];
+            }
+            // Zera o último Pokémon da lista
+            memset(&player->pokemonsEscolhidos[qntPokemon - 1], 0, sizeof(pokemon));
+            break;
+        }
+    }
+}
+
+
+void verificarPokemonMorto(jogador* player, int pokemonsVivos) {
+    if (player->pokemonEmCampo.vida <= 0) {
+        player->pokemonsVivos--;  // Diminui a contagem de pokémons vivos
+        pokemonsVivos = player->pokemonsVivos; // Atualiza a variável local
+
+        if (pokemonsVivos == 0) {
+            printf("O jogador %s perdeu", player->nome);
+            exit(0); // Finaliza o jogo se o jogador não tiver mais pokémons vivos
+        }
+
+        printf("O Pokémon %s do jogador %s morreu! Será preciso trocar de Pokémon agora.\n", player->pokemonEmCampo.nome, player->nome);
+
+        // Adiciona o Pokémon morto à lista de pokemonsMortos
+        for (int i = 0; i < qntPokemon; i++) {
+            if (strlen(player->pokmonsMortos[i].nome) == 0) {
+                player->pokmonsMortos[i] = player->pokemonEmCampo;
+                printf("Pokémon Morto: %s\n\n", player->pokmonsMortos[i].nome);
+                removerPokemonEscolhido(player, player->pokemonEmCampo); // Remove o Pokémon morto da lista de escolhidos
+                derrotarPokemon(&player->pokemonEmCampo); // Função que "zera" o Pokémon derrotado
+                break; // Saímos do loop após encontrar um espaço vazio
+            }
+        }
+
+        // Solicitar ao jogador que troque o Pokémon em campo
+        printf("Jogador %s, escolha um novo Pokémon para o campo.\n", player->nome);
+        pokemonEmCampo(player); // Função para escolher um novo Pokémon em campo
+    }
+}
+
+
+
 void combate(jogador* player1, jogador* player2) {
     int escolhaAtaque;
-    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
+    int verificador = 1;
+    
+    while (verificador == 1)
+    {
+        printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
     
     printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
     
@@ -240,9 +348,11 @@ void combate(jogador* player1, jogador* player2) {
     if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
         printf("Escolha de ataque inválida.\n");
         return;
-    }
+    } 
 
     aplicarDano(player1, player2, escolhaAtaque - 1);  // Subtraímos 1 para ajustar ao índice do vetor
+    verificarPokemonMorto(player2, player2->pokemonsVivos);   
+    }
     
 }
 
