@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define maxCaracter 50
 #define totalPokemons 3
@@ -314,7 +315,7 @@ void verificarPokemonMorto(jogador* player) {
 
         if (pokemonsVivos <= 0) {
             system("clear");
-            printf("O jogador %s perdeu\n\n", player->nome);
+            printf("O jogador %s perdeu\n\n", player->nome); 
             exit(0); // Finaliza o jogo se o jogador não tiver mais pokémons vivos
         }
 
@@ -342,26 +343,31 @@ void verificarPokemonMorto(jogador* player) {
 void combate(jogador* player1, jogador* player2) {
     int escolhaAtaque;
     int verificador = 1;
+    srand(time(NULL));
+    int escolhaComputador = rand() % 3;
     
     while (verificador == 1)
     {
-        printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
+    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
     
     printf("Jogador %s ataca com %s\n", player1->nome, player1->pokemonEmCampo.nome);
-    
     exibirHabilidades(player1);
-
     escolhaAtaque = escolherAtaque();
-    
     if (escolhaAtaque < 1 || escolhaAtaque > qntSkills) {
         printf("Escolha de ataque inválida.\n");
         return;
     } 
-
     aplicarDano(player1, player2, escolhaAtaque - 1);  // Subtraímos 1 para ajustar ao índice do vetor
-    verificarPokemonMorto(player2);   
+    verificarPokemonMorto(player2); 
+
+    pausar();
+    printf("--------------------------------------------------------\n                  FASE DE COMBATE\n--------------------------------------------------------\n\n");
+    printf("Jogador %s ataca com %s\n", player2->nome, player1->pokemonEmCampo.nome);
+    aplicarDano(player2, player1, escolhaComputador);  // Subtraímos 1 para ajustar ao índice do vetor
+    printf("O computador usou o ataque: %s", player2->pokemonEmCampo.habilidades[escolhaComputador].nome);
+    verificarPokemonMorto(player1);
+    pausar();   
     }
-    
 }
 
 
