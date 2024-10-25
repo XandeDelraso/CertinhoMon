@@ -9,6 +9,8 @@
 #define totalTipos 17
 #define danoBase 2
 
+int pokemonsVivos = qntPokemon;
+
 typedef struct {
     char nome[maxCaracter];
     char tipo[maxCaracter];
@@ -29,7 +31,6 @@ typedef struct {
     int jaEscolhido[qntPokemon];
     pokemon pokemonEmCampo;
     pokemon pokmonsMortos[qntPokemon];
-    int pokemonsVivos;
 } jogador;
 
 typedef struct
@@ -299,14 +300,21 @@ void removerPokemonEscolhido(jogador* player, pokemon pokemonMorto) {
     }
 }
 
-
-void verificarPokemonMorto(jogador* player, int pokemonsVivos) {
+void verificarPokemonMorto(jogador* player) {
     if (player->pokemonEmCampo.vida <= 0) {
-        player->pokemonsVivos--;  // Diminui a contagem de pokémons vivos
-        pokemonsVivos = player->pokemonsVivos; // Atualiza a variável local
+        pokemonsVivos--;  // Diminui a contagem de pokémons vivos
+        int num = 0;
 
-        if (pokemonsVivos == 0) {
-            printf("O jogador %s perdeu", player->nome);
+         // Contar quantos pokémons estão vivos
+        for (int i = 0; i < qntPokemon; i++) {
+            if (player->pokemonsEscolhidos[i].vida > 0) {
+                num++;
+            }
+        }
+
+        if (pokemonsVivos <= 0) {
+            system("clear");
+            printf("O jogador %s perdeu\n\n", player->nome);
             exit(0); // Finaliza o jogo se o jogador não tiver mais pokémons vivos
         }
 
@@ -351,7 +359,7 @@ void combate(jogador* player1, jogador* player2) {
     } 
 
     aplicarDano(player1, player2, escolhaAtaque - 1);  // Subtraímos 1 para ajustar ao índice do vetor
-    verificarPokemonMorto(player2, player2->pokemonsVivos);   
+    verificarPokemonMorto(player2);   
     }
     
 }
